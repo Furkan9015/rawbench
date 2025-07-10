@@ -9,9 +9,13 @@ aws s3 cp s3://ont-open-data/giab_2023.05/flowcells/hg002/20230424_1302_3H_PAO89
 
 ## E. coli
 
-cd ../ecoli
+cd ..
 
 # pip install pod5
-pod5 convert fast5 -r -t 64 --output-one-to-one ./fast5_files/ ./fast5_files/ ./pod5_files/
+# make sure fast5 files are downloaded
+pod5 convert fast5 ./ecoli/*.fast5 --output ../pod5/ecoli/ --one-to-one ./ecoli/
 
 ## D. melanogaster
+
+# make sure fast5 files are downloaded
+pod5 convert fast5 ./ecoli/*.fast5 --output ../pod5/dmelanogaster/ --one-to-one ./dmelanogaster/
