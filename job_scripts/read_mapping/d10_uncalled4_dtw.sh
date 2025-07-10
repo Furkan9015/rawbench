@@ -10,13 +10,9 @@
 #SBATCH --time=24:00:00
 cd
 source .bashrc
-# Load any required modules or activate environment
-# Example: source activate rawhash_env2
-# source /home/furkane/micromamba/etc/profile.d/conda.sh
-# conda activate rawhash_env2
 
 # Set variables
-#OUTDIR="/home/furkane/d8_uncalled4/small_res_ont"
+#OUTDIR="../../d8_uncalled4/small_res_ont"
 OUTDIR="../../outputs/d10_uncalled4_rerun"
 mkdir -p ${OUTDIR}
 DATASET="d10" 

@@ -12,7 +12,7 @@
 source .bashrc
 
 # Set variables
-#OUTDIR="/home/furkane/d8_uncalled4/small_res_ont"
+#OUTDIR="../../d8_uncalled4/small_res_ont"
 OUTDIR="../../outputs/d10_ont_hash_ttest"
 mkdir -p ${OUTDIR}
 DATASET="d10" 

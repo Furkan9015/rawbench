@@ -15,7 +15,7 @@ micromamba activate blend
 # Paths
 REF="../../refs/dmelanogaster.fa"
 READS="../../basecalled_reads/dmelanogaster.fastq"
-OUT_BAM="/home/furkane/d10_dmelanogaster/true_mappings.sorted.bam"
+OUT_BAM="../../d10_dmelanogaster/true_mappings.sorted.bam"
 
 
 minimap2 -x map-ont -t 64 -o "../../outputs/true_mappings/dmelanogaster.paf" . 
