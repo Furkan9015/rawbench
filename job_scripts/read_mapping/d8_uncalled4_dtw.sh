@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=d8_uncalled4_rerun
-#SBATCH --output=/home/furkane/rawbench/outputs/d8_uncalled4_rerun.out
-#SBATCH --error=/home/furkane/rawbench/outputs/d8_uncalled4_rerun.err
+#SBATCH --output=../../rawbench/outputs/d8_uncalled4_rerun.out
+#SBATCH --error=../../rawbench/outputs/d8_uncalled4_rerun.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
@@ -10,14 +10,10 @@
 #SBATCH --time=24:00:00
 cd
 source .bashrc
-# Load any required modules or activate environment
-# Example: source activate rawhash_env2
-# source /home/furkane/micromamba/etc/profile.d/conda.sh
-# conda activate rawhash_env2
 
 # Set variables
-#OUTDIR="/home/furkane/d8_uncalled4/small_res_ont"
-OUTDIR="/home/furkane/rawbench/outputs/d8_uncalled4_rerun"
+#OUTDIR="../../d8_uncalled4/small_res_ont"
+OUTDIR="../../rawbench/outputs/d8_uncalled4_rerun"
 mkdir -p ${OUTDIR}
 DATASET="d8" 
 PREFIX="d8" 
@@ -26,11 +22,10 @@ PREFIX="d8"
 # PREFIX="d8_human" 
 PARAMS="-w 0"
 PRESET="sensitive"
-REF="/mnt/galactica/umcconnell/rawhash2-env/rawhash2/test/data/d8_human_hg002_r1041/ref.fa"
-#PROG="/home/furkane/rawhash2_vanilla/bin/rawhash2"
-PROG="/mnt/batty/firtinac/rawhash_env2/bin/rawhash2"
-PORE="/home/furkane/uncalled_r1041_model_only_means.txt"
-FAST5="/mnt/galactica/umcconnell/rawhash2-env/rawhash2/test/data/d8_human_hg002_r1041/fast5_files_small_no_outliers/"
+REF="../../refs/hsapiens.fa"
+PROG="../../bin/rawhash2"
+PORE="../../kmer_models/uncalled_r1041_model_only_means.txt"
+FAST5="../../fast5/hsapiens/"
 # Indexing step
 /usr/bin/time -vpo "${OUTDIR}/${PREFIX}_rawhash2_index_${PRESET}_quant.time" \
 ${PROG} --bp-per-sec 400 --r10 -x ${PRESET} -t 64 --store-sig \

@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=d9_uncalled4_vectordistances_ttest
-#SBATCH --output=/home/furkane/rawbench/outputs/d9_uncalled4_vectordistances_ttest.out
-#SBATCH --error=/home/furkane/rawbench/outputs/d9_uncalled4_vectordistances_ttest.err
+#SBATCH --output=../../rawbench/outputs/d9_uncalled4_vectordistances_ttest.out
+#SBATCH --error=../../rawbench/outputs/d9_uncalled4_vectordistances_ttest.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
@@ -10,21 +10,17 @@
 #SBATCH --time=24:00:00
 
 source /mnt/galactica/furkane/.bashrc
-# Load any required modules or activate environment
-# Example: source activate rawhash_env2
-# source /home/furkane/micromamba/etc/profile.d/conda.sh
-# conda activate rawhash_env2
 
 # Set variables
-OUTDIR="/home/furkane/rawbench/outputs/d9_uncalled4_vectordistances_ttest"
+OUTDIR="../../rawbench/outputs/d9_uncalled4_vectordistances_ttest"
 mkdir -p ${OUTDIR}
 PARAMS="-w 0"
 PRESET="sensitive"
-REF="/home/furkane/d9_ecoli_r1041/ref.fa"
+REF="../../d9_ecoli_r1041/ref.fa"
 
-PROG="/home/furkane/sigmap/sigmap"
-PORE="/home/furkane/9mer_levels_v1.txt"
-FAST5="/home/furkane/d9_ecoli_r1041/fast5_files"
+PROG="../../sigmap/sigmap"
+PORE="../../9mer_levels_v1.txt"
+FAST5="../../d9_ecoli_r1041/fast5_files"
 # Indexing step
 /usr/bin/time -vpo "${OUTDIR}/${PREFIX}_sigmap_index_${PRESET}.time" ${PROG} -i -r ${REF} -p ${PORE} -o "${OUTDIR}/ecoli_index"
 

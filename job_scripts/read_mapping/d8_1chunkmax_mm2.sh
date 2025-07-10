@@ -10,4 +10,4 @@
 cd
 source .bashrc
 micromamba activate mm2
-minimap2 -x map-ont -t 32 -o "/home/furkane/rawbench/d8_human/true_mappings_1chunkmax.paf" /mnt/batty/firtinac/rawhash_env2/rawhash2/test/data/d5_human_na12878_r94/ref.fa /home/furkane/rawbench/d8_human/calls_2025-06-13_T22-20-35.fastq
+minimap2 -x map-ont -t 64 -o "../../rawbench/d8_human/true_mappings_1chunkmax.paf" ../../refs/hsapiens.fa ../../basecalled_reads/hsapiens.fastq
