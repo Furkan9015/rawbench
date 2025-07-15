@@ -13,9 +13,9 @@ cd ..
 
 # pip install pod5
 # make sure fast5 files are downloaded
-pod5 convert fast5 ./ecoli/*.fast5 --output ../pod5/ecoli/ --one-to-one ./ecoli/
+pod5 convert fast5 ../fast5/ecoli/*.fast5 --output ../pod5/ecoli/ --one-to-one ./ecoli/
 
 ## D. melanogaster
 
 # make sure fast5 files are downloaded
-pod5 convert fast5 ./ecoli/*.fast5 --output ../pod5/dmelanogaster/ --one-to-one ./dmelanogaster/
+pod5 convert fast5 ../fast5/dmelanogaster/*.fast5 --output ../pod5/dmelanogaster/ --one-to-one ./dmelanogaster/
