@@ -23,6 +23,11 @@ PROG="../../bin/rawhash2"
 PORE="../../kmer_models/uncalled4_r9.4.1.model"
 FAST5="../../fast5/zymo"
 
+# Set missing variables
+PREFIX="zymo_hashbased"
+PRESET="sensitive"
+
+# Indexing step
 /usr/bin/time -vpo "${OUTDIR}/${PREFIX}_rawhash2_index_${PRESET}.time" ${PROG} -p ${PORE} -k 6 -d "${OUTDIR}/rawhash_zymo.idx" ${REF}
 
 # Mapping step
