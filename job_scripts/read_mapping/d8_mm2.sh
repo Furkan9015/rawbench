@@ -10,4 +10,4 @@
 cd
 source .bashrc
 micromamba activate mm2
-minimap2 -x map-ont -t 64 -o "../../outputs/true_mappings/hspaiens.paf" ../../refs/hsapiens.fa ../../basecalled_reads/hsapiens.fastq
+minimap2 -x map-ont -t 64 -o "../../outputs/true_mappings/hsapiens.paf" ../../refs/hsapiens.fa ../../basecalled_reads/hsapiens.fastq

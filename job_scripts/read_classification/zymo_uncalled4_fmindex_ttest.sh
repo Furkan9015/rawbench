@@ -22,6 +22,10 @@ REF="../../refs/combined_zymo_ref.fasta"
 PROG="../../bin/rawhash2"
 PORE="../../kmer_models/uncalled4_r9.4.1.model"
 FAST5="../../fast5/zymo"
+# Set missing variables
+PREFIX="zymo_fmindex"
+PRESET="sensitive"
+
 # Indexing step
 /usr/bin/time -vpo "${OUTDIR}/${PREFIX}_uncalled_index_${PRESET}.time" uncalled index -o "${OUTDIR}/uncalled_zymo" ${REF}
 
