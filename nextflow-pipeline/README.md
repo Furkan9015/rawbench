@@ -21,18 +21,46 @@ This pipeline provides configurable evaluation of three core components:
 ### Installation
 
 ```bash
-# Clone repository
-git clone <repository-url>
-cd nextflow-pipeline
+# Navigate to the pipeline directory (assumes you have the rawbench repository)
+cd rawbench/nextflow-pipeline
 
-# Build binary components
+# First, ensure RawHash2 is built (required dependency)
+cd ../rawhash2
+make
+cd ../nextflow-pipeline
+
+# Build pipeline binary components
 cd bin
 make all
 cd ..
 
-# Test pipeline
+# Verify installation
 nextflow run main.nf --help
 ```
+
+### Step-by-Step Setup
+
+1. **Install Nextflow**:
+   ```bash
+   curl -s https://get.nextflow.io | bash
+   sudo mv nextflow /usr/local/bin/
+   ```
+
+2. **Prepare RawHash2** (required for binary components):
+   ```bash
+   cd rawbench/rawhash2
+   make  # Build RawHash2 first
+   ```
+
+3. **Build Pipeline Components**:
+   ```bash
+   cd ../nextflow-pipeline/bin
+   make all  # This links against RawHash2 libraries
+   ```
+
+4. **Prepare Your Data**:
+   - Reference genome in FASTA format
+   - Nanopore signal data in POD5 or FAST5 format
 
 ### Basic Usage
 
@@ -95,8 +123,8 @@ The pipeline is designed to produce **identical results** to RawHash2 when using
 
 ```bash
 nextflow run main.nf --preset rawhash2 \
-  --reference_fasta <ref.fa> \
-  --signal_files <signals>
+  --reference_fasta data/reference.fasta \
+  --signal_files "data/signals/*.pod5"
 ```
 
 This validation ensures component extraction is correct before enabling modular evaluation.
@@ -139,13 +167,23 @@ The binary components are extracted from RawHash2 source:
 - `signal_segmenter.c` - From `rawhash2/src/revent.c`  
 - `hash_matcher.cpp` - From `rawhash2/src/rsketch.c`, `rseed.c`, `rmap.cpp`
 
-Currently implemented as placeholders - requires linking against RawHash2 library for full functionality.
+Binary components are functional and linked against the RawHash2 library for production use.
 
 ## Citation
 
 If you use this pipeline in your research, please cite:
 
+**RawHash2** (for the extracted signal analysis components):
 ```
-[RawBench Pipeline citation to be added]
-[RawHash2 citation]
+@article{firtina2023rawhash2,
+	title = {{RawHash2}: {Mapping DNA Sequences Directly From Raw Nanopore Signals Using Hash-based Seeding and Adaptive Quantization}},
+	author = {Firtina, Can and Mansouri Ghiasi, Arian and Lindegger, Joel and Singh, Gagandeep and Cavlak, Melina Bastas and Mao, Haiyu and Alser, Mohammed},
+	journal = {Bioinformatics},
+	volume = {39},
+	number = {22},
+	pages = {4153--4162},
+	year = {2023},
+	doi = {10.1093/bioinformatics/btad272},
+	url = {https://doi.org/10.1093/bioinformatics/btad272},
+}
 ```

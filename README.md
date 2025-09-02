@@ -19,7 +19,7 @@ RawBench provides a standardized evaluation framework for comparing nanopore sig
 Clone the repository and set up the base environment:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Furkan9015/rawbench.git
 cd rawbench
 chmod +x scripts/setup_env.sh setup.sh
 ```
@@ -318,10 +318,15 @@ When modifying job scripts:
 
 If you use RawBench in your research, please cite:
 
-```
-[Citation information to be added]
+```bibtex
+@software{rawbench2025,
+  title = {RawBench: A comprehensive benchmarking framework for raw nanopore signal analysis},
+  author = {Eris, Furkan and McConnell, Ulysse and Firtina, Can and Mutlu, Onur},
+  year = {2025},
+  url = {https://github.com/Furkan9015/rawbench}
+}
 ```
 
 ## License
 
-[License information to be added]
+This project is licensed under the MIT License - see the repository for details.
