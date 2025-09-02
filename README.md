@@ -4,89 +4,234 @@ A comprehensive benchmarking framework for raw nanopore signal analysis
 
 ## Overview
 
-RawBench provides a standardized evaluation framework for comparing nanopore signal analysis tools. This repository contains:
+RawBench provides a standardized evaluation framework for comparing nanopore signal analysis tools. This repository contains job scripts, configuration templates, and setup tools for benchmarking:
 
-1. **Sigmoni** - Signal-based read classification using compressed indexing (in `sigmoni_submodule/`)
-2. **SPUMONI** - BWT-based r-index implementation for repetitive text matching (in `spumoni_submodule/`)
-3. **Benchmarking scripts** - Evaluation scripts for various nanopore analysis tools (in `job_scripts/`)
-4. **Reference data** - Genomes, basecalled reads, and k-mer models (in `refs/`, `basecalled_reads/`, `kmer_models/`)
-5. **Signal data** - Fast5 and POD5 download scripts (in `fast5/`, `pod5/`)
+1. **Sigmoni** - Signal-based read classification using compressed indexing
+2. **SPUMONI** - BWT-based r-index implementation for repetitive text matching  
+3. **Basecalling tools** - Dorado and other ONT basecallers
+4. **Read mapping tools** - minimap2 and other alignment tools
+5. **Evaluation framework** - Standardized metrics and comparison scripts
 
 ## Quick Start
 
-### Environment Setup
+### 1. Initial Setup
+
+Clone the repository and set up the base environment:
+
+```bash
+git clone <repository-url>
+cd rawbench
+chmod +x scripts/setup_env.sh setup.sh
+```
+
+### 2. Install Dependencies
+
+#### Core Tools Installation
+
+The benchmarking framework requires several external tools. Install them according to your system:
+
+**Dorado (ONT Basecaller):**
+```bash
+# Download from: https://github.com/nanoporetech/dorado
+# Install to /usr/local/bin/dorado or update DORADO_PATH in environment
+```
+
+**RawHash2 (Optional):**
+```bash 
+# Download from: https://github.com/CMU-SAFARI/RawHash2
+# Install to /usr/local/bin/rawhash2 or update RAWHASH2_PATH
+```
+
+#### Python Environment Setup
 
 ```bash
 # Create conda environment for Sigmoni
 conda create --name sigmoni python=3.8
 conda activate sigmoni
-pip install uncalled4 h5py numpy scipy
+conda install h5py numpy scipy
+pip install uncalled4
 
-# Build SPUMONI
+# Create environment for BAM processing
+conda create --name bamtofastq
+conda activate bamtofastq
+conda install bamtofastq
+
+# Create environment for minimap2
+conda create --name mm2
+conda activate mm2
+conda install minimap2
+```
+
+### 3. Install Analysis Tools
+
+#### Install Sigmoni
+```bash
+# Follow instructions in sigmoni_submodule/README.md
+# Option 1: Add as git submodule (if public repository available)
+# Option 2: Manual installation - download Sigmoni source code
+
+# Required files in sigmoni_submodule/:
+#   - index.py (index building script)
+#   - main.py (classification script) 
+#   - example/ directory with sample data
+```
+
+#### Install SPUMONI  
+```bash
+# Follow instructions in spumoni_submodule/README.md
+# Option 1: Add as git submodule (if public repository available)  
+# Option 2: Manual installation and compilation
+
+# Required: compiled spumoni executable in spumoni_submodule/build/spumoni
 cd spumoni_submodule
 mkdir build && cd build
 cmake ..
-make
-export SPUMONI_BUILD_DIR=$(pwd)
-cd ../..
+make -j$(nproc)
 ```
 
-### Basic Usage
+### 4. Environment Configuration
 
-#### 1. Sigmoni Index Building
+Configure paths for your installation:
+
 ```bash
-cd sigmoni_submodule
+# Load the environment setup (do this before running any job scripts)
+source scripts/setup_env.sh
 
-# Binary classification example (positive vs negative references)
-python index.py -p ../refs/pos_class/*.fasta -n ../refs/neg_class/*.fasta \
-  --shred 100000 -o ./output_dir --ref-prefix reference_name
-
-# Multi-class classification (positive references only)  
-python index.py -p ../refs/*.fasta \
-  --shred 100000 -o ./output_dir --ref-prefix reference_name
+# Check environment is configured correctly  
+print_environment
+validate_environment
 ```
 
-#### 2. Sigmoni Classification
-```bash
-# Binary classification with complexity correction
-python main.py -i ../fast5/organism/ -r ./output_dir/reference_name \
-  -o ./results -t 48 --complexity --sp
+#### Customize Environment Variables
 
-# Multi-class classification
-python main.py -i ../fast5/organism/ -r ./output_dir/reference_name \
-  -o ./results -t 48 --multi --complexity --sp
+Edit your shell profile (`.bashrc`, `.zshrc`) or create a local config:
+
+```bash
+# External tool paths - customize for your installation
+export DORADO_PATH="/path/to/dorado"
+export RAWHASH2_PATH="/path/to/rawhash2"
+
+# Data directories - customize for your setup
+export BASECALLING_MODELS_DIR="/path/to/basecalling_models"  
+export POD5_DATA_DIR="/path/to/pod5_data"
+
+# Then reload environment
+source scripts/setup_env.sh
 ```
 
-#### 3. SPUMONI Operations
+### 5. Data Setup
+
+#### Download Required Data
+
 ```bash
+# Create data directories
+mkdir -p ../basecalling_models ../pod5
+
+# Download Dorado models (example)
+# wget -P ../basecalling_models/ https://cdn.oxfordnanoportal.com/software/analysis/dorado/dna_r10.4.1_e8.2_400bps_sup@v5.0.0.tar.gz
+# tar -xzf ../basecalling_models/dna_r10.4.1_e8.2_400bps_sup@v5.0.0.tar.gz -C ../basecalling_models/
+
+# Place your POD5 signal data in ../pod5/
+# Expected files: hsapiens.pod5, ecoli.pod5, dmelanogaster.pod5
+```
+
+#### Reference Genomes
+
+Place reference genomes in the `refs/` directory:
+- `hsapiens.fa` - Human reference (dataset d8)
+- `ecoli.fa` - E. coli reference (dataset d9)  
+- `dmelanogaster.fa` - D. melanogaster reference (dataset d10)
+
+## Usage
+
+### Environment Loading
+
+**IMPORTANT:** Always load the environment before running any scripts:
+
+```bash
+cd rawbench/
+source scripts/setup_env.sh
+```
+
+### Running Benchmarks
+
+#### Basecalling Benchmarks
+
+```bash
+# Load environment first
+source scripts/setup_env.sh
+
+cd job_scripts/basecalling
+
+# Human dataset (d8)
+sbatch d8_basecall_sup.sh
+
+# E. coli dataset (d9)  
+sbatch d9_basecall_sup.sh
+
+# D. melanogaster dataset (d10)
+sbatch d10_basecall_sup.sh
+```
+
+#### Read Classification Benchmarks
+
+```bash
+# Load environment first
+source scripts/setup_env.sh
+
+cd job_scripts/read_classification
+
+# Sigmoni-based classification
+sbatch zymo_ont_rindex_ttest.sh
+sbatch zymo_uncalled4_rindex_ttest.sh
+```
+
+#### Read Mapping Benchmarks  
+
+```bash
+# Load environment first
+source scripts/setup_env.sh
+
+cd job_scripts/read_mapping
+
+# minimap2 mapping
+sbatch d8_2chunksmax_mm2.sh
+sbatch d9_1chunkmax_mm2.sh
+```
+
+### Manual Tool Usage
+
+#### Sigmoni Classification
+
+```bash
+# Activate environment
+source scripts/setup_env.sh
+conda activate sigmoni
+
+cd sigmoni_submodule/example/zymo
+
+# Build index
+python ../../index.py -p ref_fastas/pos_class/*.fasta -n ref_fastas/neg_class/*.fasta \
+  -b 6 --shred 100000 -o ./ --ref-prefix zymo_ont
+
+# Run classification  
+python ../../main.py -i fast5/ -r refs/zymo_ont -b 6 -t 64 -o ./ \
+  --complexity --thresh 1.6666666666333334
+```
+
+#### SPUMONI Operations
+
+```bash
+# Activate environment
+source scripts/setup_env.sh
+
 cd spumoni_submodule
 
-# Build index for matching statistics and pseudo-matching lengths
+# Build index
 ./build/spumoni build -r ../refs/reference.fa -M -P -m -o ./index_dir
 
 # Run classification
 ./build/spumoni run -r ./index_dir -p ../basecalled_reads/reads.fa -P -c
-```
-
-## Evaluation with uncalled pafstats
-
-The benchmarking framework uses `uncalled pafstats` for evaluation metrics:
-
-```bash
-# Annotate PAF files with evaluation metrics
-uncalled pafstats -r ground_truth.paf --annotate tool_output.paf \
-  > annotated_output.paf 2> throughput_metrics.txt
-```
-
-Example usage in scripts:
-```bash
-# For d9 dataset
-uncalled pafstats -r d9_true_mappings.paf --annotate d9_rawhash2_sensitive_quant.paf \
-  > d9_rawhash2_sensitive_quant_ann.paf 2> d9_rawhash2_sensitive_quant_ann.throughput
-
-# For d10 dataset  
-uncalled pafstats -r d10_true_mappings.paf --annotate d10_rawhash2_sensitive_quant.paf \
-  > d10_rawhash2_sensitive_quant_ann.paf 2> d10_rawhash2_sensitive_quant_ann.throughput
 ```
 
 ## Repository Structure
@@ -94,94 +239,80 @@ uncalled pafstats -r d10_true_mappings.paf --annotate d10_rawhash2_sensitive_qua
 ```
 rawbench/
 ├── README.md                 # This file
-├── sigmoni_submodule/        # Sigmoni tool for signal-based classification
-├── spumoni_submodule/        # SPUMONI tool for BWT-based indexing
-├── job_scripts/              # Benchmarking and evaluation scripts
+├── DEPENDENCIES.md           # Detailed dependency information
+├── setup.sh                  # Legacy setup script
+├── scripts/
+│   └── setup_env.sh          # Environment configuration script
+├── sigmoni_submodule/        # Sigmoni tool installation directory
+│   └── README.md             # Installation instructions
+├── spumoni_submodule/        # SPUMONI tool installation directory
+│   └── README.md             # Installation instructions  
+├── job_scripts/              # SLURM job scripts for benchmarking
 │   ├── basecalling/          # Basecalling benchmark scripts
 │   ├── read_mapping/         # Read mapping evaluation scripts
-│   ├── read_classification/  # Classification benchmark scripts
-│   ├── extract_read_ids.py   # Utility for read ID extraction
-│   └── pod5_*.py            # POD5 processing utilities
+│   └── read_classification/  # Classification benchmark scripts
 ├── refs/                     # Reference genomes (FASTA format)
-├── basecalled_reads/         # Pre-basecalled FASTQ files
+├── outputs/                  # Generated results and logs
+├── basecalled_reads/         # Generated basecalled FASTQ files
 ├── kmer_models/             # K-mer models for nanopore chemistries
 ├── fast5/                   # Fast5 signal data download scripts
-└── pod5/                    # POD5 signal data download scripts
+├── pod5/                    # POD5 signal data download scripts
+└── .gitignore               # Excludes build artifacts and data files
 ```
 
-## Data Organization
+## Expected Directory Structure (Full Installation)
 
-### Reference Genomes (refs/)
-- `dmelanogaster.fa` - D. melanogaster reference
-- `ecoli.fa` - E. coli reference  
-- `hsapiens.fa` - Human reference
-
-### Basecalled Reads (basecalled_reads/)
-- `dmelanogaster.fastq` - D. melanogaster basecalled reads
-- `ecoli.fastq` - E. coli basecalled reads
-- `hsapiens.fastq` - Human basecalled reads
-
-### K-mer Models (kmer_models/)
-- `ont_r10.4.1.txt` - ONT R10.4.1 chemistry model
-- `uncalled4_r10.4.1.txt` - UNCALLED4 compatible model
-
-## Running Benchmarks
-
-### Basecalling Benchmarks
-```bash
-cd job_scripts/basecalling
-bash d8_basecall_sup.sh    # Human dataset basecalling
-bash d9_basecall_sup.sh    # E. coli dataset basecalling
-bash d10_basecall_sup.sh   # D. melanogaster dataset basecalling
+```
+parent_directory/
+├── basecalling_models/       # Dorado neural network models
+├── pod5/                     # POD5 signal files by organism
+├── bin/                      # External tool binaries (optional)
+│   ├── dorado
+│   └── rawhash2
+└── rawbench/                 # This repository
+    ├── sigmoni_submodule/    # Sigmoni source code
+    ├── spumoni_submodule/    # SPUMONI source code & build/
+    └── [rest of repository]
 ```
 
-### Read Mapping Benchmarks
-```bash
-cd job_scripts/read_mapping
-bash d8_mm2.sh             # Human minimap2 mapping
-bash d9_mm2.sh             # E. coli minimap2 mapping
-bash d10_mm2.sh            # D. melanogaster minimap2 mapping
-```
+## Troubleshooting
 
-### Read Classification Benchmarks
-```bash
-cd job_scripts/read_classification
-bash zymo_ont_rindex_ttest.sh          # ONT r-index classification
-bash zymo_uncalled4_fmindex_ttest.sh   # UNCALLED4 FM-index classification
-bash zymo_uncalled4_hashbased_ttest.sh # Hash-based classification
-```
+### Environment Validation
 
-## Environment Variables
-
-Set these environment variables for proper operation:
+Check if all required tools are installed:
 
 ```bash
-export SPUMONI_BUILD_DIR=/path/to/rawbench/spumoni_submodule/build
-export PATH=$SPUMONI_BUILD_DIR:$PATH
+source scripts/setup_env.sh
+validate_environment
 ```
 
-## Signal Processing Pipeline
+### Common Issues
 
-Sigmoni processes raw nanopore signals through:
+1. **"Dorado not found"** - Update `DORADO_PATH` environment variable
+2. **"SPUMONI executable not found"** - Compile SPUMONI in `spumoni_submodule/build/`
+3. **"Sigmoni not found"** - Install Sigmoni source files according to `sigmoni_submodule/README.md`
+4. **Missing conda environments** - Create required environments (sigmoni, bamtofastq, mm2)
+5. **Path issues** - Always run `source scripts/setup_env.sh` before job scripts
 
-1. **Signal Quantization** - Projects raw signal into discrete alphabet
-2. **Binning** - Discretizes signal using configurable bins (default: 6)
-3. **Reference Matching** - Exact matching against compressed r-index  
-4. **Classification** - Binary or multi-class based on matching statistics
+### Job Script Debugging
 
-Key parameters:
-- `--complexity`: Enable sequence complexity correction for complex genomes
-- `--sp`: Filter sequencing stalls before classification
-- `-b 6`: Use 6-bin quantization (recommended)
-- `--shred 100000`: Shred references into 100kb chunks
+Job scripts include validation and will report missing dependencies. Check SLURM output files in `outputs/` for detailed error messages.
 
 ## Output Formats
 
-- `*.report` files: Classification results for each read
-- `*.pseudo_lengths` files: PML (Pseudo-Matching Length) profiles  
+- `*.out` / `*.err` files: SLURM job outputs and errors
+- `*.report` files: Classification results for each read  
 - `*.paf` files: Alignment results in PAF format
-- `*_ann.paf` files: Annotated PAF with evaluation metrics
+- `*_timing.log` files: Performance timing measurements
 - `*.throughput` files: Performance and accuracy metrics
+
+## Contributing
+
+When modifying job scripts:
+1. Maintain environment variable usage instead of hardcoded paths
+2. Include validation checks for required files/tools
+3. Update documentation if changing expected directory structure
+4. Test with `validate_environment` before committing
 
 ## Citation
 
