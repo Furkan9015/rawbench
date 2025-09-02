@@ -1,0 +1,6 @@
+{
+  "task": "m-refactor-rawbench-reproducible",
+  "branch": "feature/refactor-rawbench-reproducible",
+  "services": ["rawbench"],
+  "updated": "2025-09-02"
+}

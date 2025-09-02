@@ -1,0 +1,59 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.dylib
+*.dll
+cmake_build_debug/
+cmake_build_release/
+_deps/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Output directories and results
+outputs/
+results/
+logs/
+*.out
+*.err
+*.log
+*.report
+
+# Data files (usually too large for git)
+*.pod5
+*.fast5
+*.bam
+*.fastq
+*.fq
+*.paf
+*.sam
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+
+# Conda environments
+.conda/
+envs/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files  
+.DS_Store
+Thumbs.db
